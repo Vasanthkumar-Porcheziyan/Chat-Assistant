@@ -2,8 +2,23 @@ import streamlit as st
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import random
 
 load_dotenv(".env.local")
+
+# Random processing messages for the spinner
+PROCESSING_MESSAGES = [
+    "🤖 Processing your message...",
+    "⏳ Analyzing your input...",
+    "🧠 Thinking deeply...",
+    "⚡ Running inference...",
+    "📊 Generating response...",
+    "🔄 Processing request...",
+    "💭 Crafting a response...",
+    "🚀 Computing answer...",
+    "📡 Contacting AI engine...",
+    "⌛ Working on that...",
+]
 
 # Function to display user messages with rounded rectangle borders
 def user_message(message):
@@ -44,6 +59,7 @@ def generate_bot_response(messages):
 
 # Define the main Streamlit app
 def main(i):
+    st.set_page_config(page_title="Personal ChatBot", page_icon="🤖", layout="wide")
     st.title("Personal Chat Assistant")
     # Initialize chat history using session state
     if "chat_history" not in st.session_state:
@@ -98,8 +114,11 @@ def main(i):
 
         # Prepare the messages for the API call by extracting only the text from the chat history
         messages = [{"role": "user", "content": msg} if not is_bot else {"role": "assistant", "content": msg} for msg, is_bot in st.session_state.chat_history]
-        # Bot's static response (you can replace this with a dynamic response generator)
-        bot_response = generate_bot_response(messages)
+
+        # Show loading indicator with random message while generating response
+        random_message = random.choice(PROCESSING_MESSAGES)
+        with st.spinner(random_message):
+            bot_response = generate_bot_response(messages)
 
         # Add the bot's response to the chat history
         st.session_state.chat_history.append((bot_response, True))
