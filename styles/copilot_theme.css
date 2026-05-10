@@ -137,6 +137,25 @@ html, body, [class*="css"] {
     transform: translateY(0);
 }
 
+/* AI Awareness Note below Chat Input */
+[data-testid="stBottomBlockContainer"],
+div[class*="stChatFloatingInputContainer"] {
+    padding-bottom: 2.5rem !important; /* Make room below the input box */
+}
+
+[data-testid="stBottomBlockContainer"]::after,
+div[class*="stChatFloatingInputContainer"]::after {
+    content: "AI can make mistakes. Consider verifying important information.";
+    position: absolute;
+    bottom: 0.75rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #8b949e;
+    pointer-events: none;
+}
+
 /* Sidebar layout fixes */
 .stSidebar {
     border-right: 1px solid #30363d !important;
