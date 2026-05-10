@@ -1,3 +1,5 @@
 streamlit
 openai
 python-dotenv
+SQLAlchemy
+psycopg2-binary

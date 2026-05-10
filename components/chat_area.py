@@ -1,7 +1,7 @@
 import streamlit as st
 
 def render_welcome_screen():
-    """Render a Copilot-style welcome screen when chat is empty"""
+    """Render a welcome screen when chat is empty"""
     st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:

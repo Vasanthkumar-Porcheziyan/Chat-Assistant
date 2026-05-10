@@ -1,4 +1,5 @@
 import streamlit as st
+from services.chat_manager import get_all_sessions
 
 def render_sidebar():
     """Render the sidebar with navigation and settings"""
@@ -12,13 +13,16 @@ def render_sidebar():
         
         # Conversation History
         st.markdown("<p style='font-size: 0.85rem; color: #b392f0; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;'>Recent Chats</p>", unsafe_allow_html=True)
-        if "conversations" in st.session_state and st.session_state.conversations:
-            for chat_id, chat_data in reversed(list(st.session_state.conversations.items())):
-                title = chat_data.get("title", "New Chat")
+        
+        sessions = get_all_sessions()
+        if sessions:
+            for session in sessions:
+                chat_id = session['session_id']
+                title = session.get("title", "New Chat")
                 # Highlight the active chat differently via CSS or text styling
-                prefix = "💬" if chat_id != st.session_state.current_chat_id else "🔹"
+                prefix = "💬" if str(chat_id) != str(st.session_state.current_chat_id) else "🔹"
                 if st.button(f"{prefix} {title}", key=f"chat_{chat_id}", use_container_width=True):
-                    st.session_state.current_chat_id = chat_id
+                    st.session_state.current_chat_id = str(chat_id)
                     st.rerun()
         else:
             st.caption("No recent chats.")
@@ -108,4 +112,4 @@ def render_sidebar():
         
         # App info
         st.caption("Personal Chat Assistant v1.1")
-        st.caption("UI Theme: Copilot Style")
+        st.caption("UI Theme: Dark Mode")

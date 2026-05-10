@@ -1,9 +1,8 @@
 import streamlit as st
-from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import random
-import uuid
+
 # Load environment variables
 load_dotenv(".env.local")
 
@@ -11,6 +10,17 @@ load_dotenv(".env.local")
 from components.header import render_header
 from components.sidebar import render_sidebar
 from components.chat_area import render_chat_history
+
+# Import services
+from services.llm_service import generate_bot_response
+from services.chat_manager import (
+    initialize_chat_state, 
+    get_current_history, 
+    create_new_chat, 
+    add_message, 
+    prepare_messages_for_llm
+)
+from services.connect_postgresdb import get_db_connection, init_db
 
 # Random processing messages for the spinner
 PROCESSING_MESSAGES = [
@@ -26,35 +36,13 @@ PROCESSING_MESSAGES = [
     "⌛ Working on that...",
 ]
 
-def generate_bot_response(messages, model, settings):
-    """Generate bot response using selected model and settings"""
-    client = OpenAI(
-        base_url=os.getenv("NVIDIA_BASE_URL"),
-        api_key=os.getenv("NVIDIA_API_KEY")
-    )
-
-    completion = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=settings["temperature"],
-        top_p=settings["top_p"],
-        max_tokens=settings["max_tokens"],
-        stream=True
-    )
-
-    bot_response = ""
-    for chunk in completion:
-        if chunk.choices and chunk.choices[0].delta.content is not None:
-            bot_response += chunk.choices[0].delta.content
-    return bot_response
-
 # Define the main Streamlit app
 def main():
     st.set_page_config(page_title="Personal Chat Assistant", page_icon="🤖", layout="wide")
     
     # Load custom CSS with error handling
     try:
-        with open("styles/copilot_theme.css") as f:
+        with open("styles/dark_theme.css") as f:
             css_content = f.read()
             # Only apply CSS if file is not empty
             if css_content.strip():
@@ -64,12 +52,12 @@ def main():
     except Exception:
         pass  # Silently continue on any other error
     
-    # Initialize session state
-    if "conversations" not in st.session_state:
-        st.session_state.conversations = {}  # { chat_id: {"title": str, "history": []} }
-        
-    if "current_chat_id" not in st.session_state:
-        st.session_state.current_chat_id = None
+    # Initialize Database
+    conn = get_db_connection()
+    init_db(conn)
+    
+    # Initialize chat session state variables
+    initialize_chat_state()
     
     if "selected_model" not in st.session_state:
         st.session_state.selected_model = "google/gemma-2-2b-it"
@@ -88,11 +76,9 @@ def main():
     
     # Render sidebar
     render_sidebar()
+    
     # Display chat history
-    current_history = []
-    if st.session_state.current_chat_id and st.session_state.current_chat_id in st.session_state.conversations:
-        current_history = st.session_state.conversations[st.session_state.current_chat_id]["history"]
-        
+    current_history = get_current_history()
     render_chat_history(current_history)
     
     # Input field for user to enter a message
@@ -107,19 +93,13 @@ def main():
     if user_input:
         if not st.session_state.current_chat_id:
             # Create a new conversation
-            chat_id = str(uuid.uuid4())
-            title = user_input[:30] + "..." if len(user_input) > 30 else user_input
-            st.session_state.conversations[chat_id] = {"title": title, "history": []}
-            st.session_state.current_chat_id = chat_id
+            create_new_chat(user_input)
             
-        chat_history = st.session_state.conversations[st.session_state.current_chat_id]["history"]
-        
         # Add user message to chat history
-        chat_history.append((user_input, False))
+        add_message(user_input, is_bot=False)
         
         # Prepare messages for API call
-        messages = [{"role": "user", "content": msg} if not is_bot else {"role": "assistant", "content": msg} 
-                   for msg, is_bot in chat_history]
+        messages = prepare_messages_for_llm()
         
         # Show loading indicator with random message while generating response
         random_message = random.choice(PROCESSING_MESSAGES)
@@ -131,7 +111,7 @@ def main():
             )
         
         # Add bot response to chat history
-        chat_history.append((bot_response, True))
+        add_message(bot_response, is_bot=True)
         
         # Rerun to update the chat display
         st.rerun()
