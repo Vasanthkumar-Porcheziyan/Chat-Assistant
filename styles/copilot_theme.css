@@ -1,5 +1,10 @@
-/* Minimal layout CSS for Streamlit Copilot Theme */
-/* We rely on .streamlit/config.toml for all dark mode colors */
+/* UI/UX Pro Max Theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif !important;
+    scroll-behavior: smooth;
+}
 
 /* Make native Streamlit header transparent instead of hiding it */
 [data-testid="stHeader"] {
@@ -34,39 +39,102 @@
     padding-top: 6rem !important;
 }
 
-/* Chat message styling - Minimal */
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Chat message styling */
 .stChatMessage {
     padding: 0.5rem 1rem;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
     background-color: transparent !important;
     border: none !important;
+    animation: fadeInUp 0.3s ease-out forwards;
 }
 
-/* User message styling */
-.stChatMessage[data-testid="stChatMessage"]:has(.stChatMessageContent.user) {
-    /* No background or border for Copilot style */
+/* User message bubble (ChatGPT style) */
+.stChatMessage.user [data-testid="stChatMessageContent"] {
+    background: linear-gradient(135deg, rgba(43, 31, 66, 0.6), rgba(29, 33, 51, 0.6));
+    border-radius: 16px 16px 4px 16px;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid rgba(179, 146, 240, 0.3);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+    color: #e6edf3;
+    width: fit-content;
+    max-width: 85%;
 }
 
-/* Assistant message styling */
-.stChatMessage[data-testid="stChatMessage"]:has(.stChatMessageContent.assistant) {
-    /* No background or border for Copilot style */
+/* Assistant message typography */
+.stChatMessage.assistant [data-testid="stChatMessageContent"] {
+    background-color: transparent;
+    padding: 0.75rem 0.5rem;
+    line-height: 1.6;
 }
 
-/* Adjust avatar sizing to match Copilot */
+/* Adjust avatar sizing */
 .stChatMessage [data-testid="stChatAvatar"] {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
 }
 
-/* Clean up input container */
+/* Floating Glassmorphism Input */
 [data-testid="stChatInput"] {
-    border-radius: 12px;
-    border: 1px solid #30363d;
-    background-color: #161b22;
+    border-radius: 24px;
+    border: 1px solid rgba(139, 148, 158, 0.2);
+    background-color: rgba(22, 27, 34, 0.7);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    transition: all 0.2s ease;
+    padding: 0.2rem;
 }
 [data-testid="stChatInput"]:focus-within {
-    border-color: #8b949e;
+    border-color: #b392f0; /* Purple accent on focus */
+    box-shadow: 0 0 0 2px rgba(179, 146, 240, 0.3), 0 8px 32px rgba(0,0,0,0.5);
+    background-color: rgba(22, 27, 34, 0.95);
+}
+
+/* Remove native Streamlit inner focus ring (blue border) inside the chat input */
+[data-testid="stChatInput"] > div, 
+[data-testid="stChatInput"] > div:focus-within,
+[data-testid="stChatInput"] textarea:focus {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    background-color: transparent !important;
+}
+
+/* Suggestion Chips (Main Area Buttons) */
+[data-testid="stAppViewBlockContainer"] [data-testid="stButton"] button {
+    background-color: rgba(33, 38, 45, 0.6);
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 1rem;
+    color: #c9d1d9;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+[data-testid="stAppViewBlockContainer"] [data-testid="stButton"] button:hover {
+    transform: translateY(-2px);
+    border-color: #b392f0; /* Purple accent hover */
+    background-color: rgba(48, 54, 61, 0.8);
+    box-shadow: 0 6px 16px rgba(179, 146, 240, 0.15);
+    color: #ffffff;
+}
+
+[data-testid="stAppViewBlockContainer"] [data-testid="stButton"] button:active {
+    transform: translateY(0);
 }
 
 /* Sidebar layout fixes */
@@ -98,15 +166,19 @@
 
 /* Keep the New Chat button as a prominent primary action */
 .stSidebar [data-testid="stButton"] button[kind="primary"] {
-    background-color: #238636 !important; /* GitHub green for primary action */
+    background-color: #8957e5 !important; /* Purple accent to match theme */
     color: #ffffff !important;
     justify-content: center;
     border-radius: 6px;
     padding: 0.5rem 1rem;
+    box-shadow: 0 4px 12px rgba(137, 87, 229, 0.2) !important;
+    transition: all 0.2s ease;
 }
 
 .stSidebar [data-testid="stButton"] button[kind="primary"]:hover {
-    background-color: #2ea043 !important;
+    background-color: #9e6aee !important;
+    box-shadow: 0 6px 16px rgba(137, 87, 229, 0.3) !important;
+    transform: translateY(-1px);
 }
 
 /* Hide Streamlit default UI elements if necessary */

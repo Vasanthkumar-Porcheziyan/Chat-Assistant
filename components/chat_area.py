@@ -5,7 +5,11 @@ def render_welcome_screen():
     st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.markdown("<h1 style='text-align: center; color: #c9d1d9;'>Hi, I'm your Personal Assistant</h1>", unsafe_allow_html=True)
+        st.markdown("""
+        <h1 style='text-align: center; background: linear-gradient(90deg, #58a6ff, #b392f0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
+        Hi, I'm your Personal Assistant
+        </h1>
+        """, unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; color: #8b949e;'>I can answer questions, help you learn, and write code.</p>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
         

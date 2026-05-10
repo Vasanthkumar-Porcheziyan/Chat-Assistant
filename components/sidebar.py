@@ -11,7 +11,7 @@ def render_sidebar():
         st.markdown("<br>", unsafe_allow_html=True)
         
         # Conversation History
-        st.markdown("<p style='font-size: 0.85rem; color: #8b949e; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;'>Recent Chats</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 0.85rem; color: #b392f0; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;'>Recent Chats</p>", unsafe_allow_html=True)
         if "conversations" in st.session_state and st.session_state.conversations:
             for chat_id, chat_data in reversed(list(st.session_state.conversations.items())):
                 title = chat_data.get("title", "New Chat")
@@ -25,7 +25,7 @@ def render_sidebar():
             
         st.divider()
         
-        st.markdown("<p style='font-size: 0.85rem; color: #8b949e; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;'>Settings</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 0.85rem; color: #b392f0; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;'>Settings</p>", unsafe_allow_html=True)
         
         # Model selection
         available_models = [
