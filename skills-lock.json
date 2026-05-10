@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "streamlit": {
+      "source": "silvainfm/claude-skills",
+      "sourceType": "github",
+      "skillPath": "streamlit/SKILL.md",
+      "computedHash": "949f2a78daaee124512332a11b736fbbe76845a73fb1e7253d45cd81b5caf115"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "6337038fe1fe6bbe1b9f252ab678ee575859190bab6f0f246f4061824eb40875"
+    },
+    "understanding-streamlit-architecture": {
+      "source": "streamlit/streamlit",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/understanding-streamlit-architecture/SKILL.md",
+      "computedHash": "89c8aaf72bf6f02329aaa0b9cfb8c4b15ad5de91a1a5cb6bfd8f5362aa8f09e1"
+    }
+  }
+}
