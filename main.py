@@ -3,7 +3,7 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import random
-
+import uuid
 # Load environment variables
 load_dotenv(".env.local")
 
@@ -50,7 +50,7 @@ def generate_bot_response(messages, model, settings):
 
 # Define the main Streamlit app
 def main():
-    st.set_page_config(page_title="Personal ChatBot", page_icon="🤖", layout="wide")
+    st.set_page_config(page_title="Personal Chat Assistant", page_icon="🤖", layout="wide")
     
     # Load custom CSS with error handling
     try:
@@ -65,9 +65,11 @@ def main():
         pass  # Silently continue on any other error
     
     # Initialize session state
-    if "chat_history" not in st.session_state:
-        message = "Let's start chatting! 👇"
-        st.session_state.chat_history = [(message, True)]  # List of tuples (message, is_bot_response)
+    if "conversations" not in st.session_state:
+        st.session_state.conversations = {}  # { chat_id: {"title": str, "history": []} }
+        
+    if "current_chat_id" not in st.session_state:
+        st.session_state.current_chat_id = None
     
     if "selected_model" not in st.session_state:
         st.session_state.selected_model = "google/gemma-2-2b-it"
@@ -87,19 +89,37 @@ def main():
     # Render sidebar
     render_sidebar()
     # Display chat history
-    render_chat_history(st.session_state.chat_history)
+    current_history = []
+    if st.session_state.current_chat_id and st.session_state.current_chat_id in st.session_state.conversations:
+        current_history = st.session_state.conversations[st.session_state.current_chat_id]["history"]
+        
+    render_chat_history(current_history)
     
     # Input field for user to enter a message
     user_input = st.chat_input("Your Message:")
     
+    # Handle suggestion input if clicked
+    if "suggestion_input" in st.session_state and st.session_state.suggestion_input:
+        user_input = st.session_state.suggestion_input
+        st.session_state.suggestion_input = ""  # Clear after taking
+        
     # Handle user input
     if user_input:
+        if not st.session_state.current_chat_id:
+            # Create a new conversation
+            chat_id = str(uuid.uuid4())
+            title = user_input[:30] + "..." if len(user_input) > 30 else user_input
+            st.session_state.conversations[chat_id] = {"title": title, "history": []}
+            st.session_state.current_chat_id = chat_id
+            
+        chat_history = st.session_state.conversations[st.session_state.current_chat_id]["history"]
+        
         # Add user message to chat history
-        st.session_state.chat_history.append((user_input, False))
+        chat_history.append((user_input, False))
         
         # Prepare messages for API call
         messages = [{"role": "user", "content": msg} if not is_bot else {"role": "assistant", "content": msg} 
-                   for msg, is_bot in st.session_state.chat_history]
+                   for msg, is_bot in chat_history]
         
         # Show loading indicator with random message while generating response
         random_message = random.choice(PROCESSING_MESSAGES)
@@ -111,7 +131,7 @@ def main():
             )
         
         # Add bot response to chat history
-        st.session_state.chat_history.append((bot_response, True))
+        chat_history.append((bot_response, True))
         
         # Rerun to update the chat display
         st.rerun()

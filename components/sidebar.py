@@ -1,9 +1,31 @@
 import streamlit as st
 
 def render_sidebar():
-    """Render the sidebar with model selection and info"""
+    """Render the sidebar with navigation and settings"""
     with st.sidebar:
-        st.header("🤖 Model Settings")
+        # New Chat Button
+        if st.button("➕ New Chat", use_container_width=True, type="primary"):
+            st.session_state.current_chat_id = None
+            st.rerun()
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Conversation History
+        st.markdown("<p style='font-size: 0.85rem; color: #8b949e; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;'>Recent Chats</p>", unsafe_allow_html=True)
+        if "conversations" in st.session_state and st.session_state.conversations:
+            for chat_id, chat_data in reversed(list(st.session_state.conversations.items())):
+                title = chat_data.get("title", "New Chat")
+                # Highlight the active chat differently via CSS or text styling
+                prefix = "💬" if chat_id != st.session_state.current_chat_id else "🔹"
+                if st.button(f"{prefix} {title}", key=f"chat_{chat_id}", use_container_width=True):
+                    st.session_state.current_chat_id = chat_id
+                    st.rerun()
+        else:
+            st.caption("No recent chats.")
+            
+        st.divider()
+        
+        st.markdown("<p style='font-size: 0.85rem; color: #8b949e; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;'>Settings</p>", unsafe_allow_html=True)
         
         # Model selection
         available_models = [
@@ -19,10 +41,11 @@ def render_sidebar():
             st.session_state.selected_model = available_models[0]
         
         selected_model = st.selectbox(
-            "Select Model",
+            "Language Model",
             options=available_models,
             index=available_models.index(st.session_state.selected_model) if st.session_state.selected_model in available_models else 0,
-            key="model_selectbox"
+            key="model_selectbox",
+            help="Select the AI model to power the chat."
         )
         
         # Update session state if model changed
@@ -30,11 +53,10 @@ def render_sidebar():
             st.session_state.selected_model = selected_model
             st.rerun()
         
-        # Display current model info
-        st.info(f"**Current Model:** {st.session_state.selected_model}")
+        st.divider()
         
         # Quick settings expander
-        with st.expander("⚙️ Quick Settings", expanded=False):
+        with st.expander("Generation Parameters", expanded=False):
             if "llm_settings" not in st.session_state:
                 st.session_state.llm_settings = {
                     "temperature": 0.2,
@@ -82,8 +104,8 @@ def render_sidebar():
                 st.rerun()
         
         # Add some spacing
-        st.divider()
+        st.markdown("<br><br>", unsafe_allow_html=True)
         
         # App info
-        st.caption("Personal Chat Assistant v1.0")
-        st.caption("Built with Streamlit")
+        st.caption("Personal Chat Assistant v1.1")
+        st.caption("UI Theme: Copilot Style")
